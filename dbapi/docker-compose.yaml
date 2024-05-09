@@ -1,0 +1,17 @@
+version: '3.12'
+
+services:
+    database_api:
+        image: idbapi
+        container_name: dbapi
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        env_file:
+            - .env
+        ports:
+            - 6432:6432
+        restart: on-failure
+
+volumes:
+    logs:

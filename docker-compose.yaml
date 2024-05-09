@@ -1,0 +1,54 @@
+version: '3.12'
+
+services:
+    telegrambot:
+        image: itelegrambot
+        container_name: telegrambot
+        build:
+            context: ./telegrambot/
+            dockerfile: Dockerfile
+        depends_on:
+            - recsys
+            - database
+        env_file:
+            - telegrambot/.env
+        ports:
+            - 443:443
+        restart: on-failure
+    recsys:
+        image: irecsys
+        container_name: recsys
+        build:
+            context: ./recsys/
+            dockerfile: Dockerfile
+        ports:
+            - 8000:8000
+        restart: on-failure
+    database:
+        image: idb
+        container_name: db
+        build:
+            context: ./db/
+            dockerfile: Dockerfile
+        env_file:
+            - db/.env
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    database_api:
+        image: idbapi
+        container_name: dbapi
+        build:
+            context: ./dbapi/
+            dockerfile: Dockerfile
+        depends_on:
+            - database
+        env_file:
+            - dbapi/.env
+        ports:
+            - 6432:6432
+        restart: on-failure
+
+volumes:
+    logs:
